@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:CarTrackApp"
+             x:Class="CarTrackApp.ExpenseStatisticsPage"
+             x:DataType="local:ExpenseStatisticsViewModel"
+             Title="Harcama analizi"
+             Background="#F3F5F8">
+    <Grid RowDefinitions="*">
+        <ScrollView>
+            <VerticalStackLayout Padding="16,12,16,28" Spacing="14">
+                <VerticalStackLayout Spacing="3">
+                    <Label Text="Harcama analizi"
+                           FontSize="26"
+                           FontAttributes="Bold"
+                           TextColor="#14213D" />
+                    <Label Text="Araçlarının giderlerini dönem, kategori ve araç bazında incele."
+                           FontSize="13"
+                           TextColor="#687386" />
+                </VerticalStackLayout>
+
+                <Picker Title="Dönem seç"
+                        ItemsSource="{Binding PeriodOptions}"
+                        SelectedItem="{Binding SelectedPeriod}"
+                        BackgroundColor="White"
+                        TextColor="#14213D" />
+
+                <Border Padding="18"
+                        Background="#14213D"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 16">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Seçili dönemde toplam harcama"
+                               FontSize="13"
+                               TextColor="#D6E0F0" />
+                        <Label Text="{Binding TotalCost}"
+                               FontSize="30"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+                        <Label Text="{Binding RecordCount}"
+                               FontSize="12"
+                               TextColor="#B9C9E5" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Border Padding="13"
+                            Background="White"
+                            Stroke="#E1E7EF"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="Aylık ortalama" FontSize="12" TextColor="#687386" />
+                            <Label Text="{Binding MonthlyAverage}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#25436B" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="1"
+                            Padding="13"
+                            Background="White"
+                            Stroke="#E1E7EF"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="En yüksek kategori" FontSize="12" TextColor="#687386" />
+                            <Label Text="{Binding TopCategory}"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   TextColor="#14213D"
+                                   LineBreakMode="TailTruncation" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <Border Padding="16"
+                        Background="White"
+                        Stroke="#E5ECE8"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14">
+                    <Border.Shadow>
+                        <Shadow Brush="#193C2C"
+                                Offset="0,3"
+                                Radius="10"
+                                Opacity="0.08" />
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="14">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                                <Border WidthRequest="38"
+                                        HeightRequest="38"
+                                        Background="#E7F5EC"
+                                        StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 12">
+                                    <Label Text="📊"
+                                           FontSize="23"
+                                           FontAttributes="Bold"
+                                           TextColor="#17845A"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Spacing="1" VerticalOptions="Center">
+                                    <Label Text="Harcama eğilimi"
+                                           FontSize="17"
+                                           FontAttributes="Bold"
+                                           TextColor="#14213D" />
+                                    <Label Text="{Binding ChartDescription}"
+                                           FontSize="11"
+                                           TextColor="#7B8794" />
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                            <Border Grid.Column="1"
+                                    Padding="9,6"
+                                    Background="#F2F6F4"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 10"
+                                    VerticalOptions="Center">
+                                <Label Text="₺ / AY"
+                                       FontSize="10"
+                                       FontAttributes="Bold"
+                                       TextColor="#61766B" />
+                            </Border>
+                        </Grid>
+
+                        <Border Padding="8,8,8,2"
+                                Background="#FAFCFB"
+                                Stroke="#EDF2EE"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 14">
+                            <GraphicsView Drawable="{Binding ChartDrawable}"
+                                          HeightRequest="205"
+                                          HorizontalOptions="Fill"
+                                          VerticalOptions="Fill" />
+                        </Border>
+
+                        <Border Padding="11,9"
+                                Background="#F0F8F3"
+                                Stroke="#E1F0E7"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 11">
+                            <HorizontalStackLayout Spacing="7" VerticalOptions="Center">
+                                <Label Text="●"
+                                       FontSize="10"
+                                       TextColor="#17845A"
+                                       VerticalOptions="Center" />
+                                <Label Text="{Binding PeakMonthSummary}"
+                                       FontSize="11"
+                                       FontAttributes="Bold"
+                                       TextColor="#356B50"
+                                       LineBreakMode="WordWrap"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="16"
+                        Background="White"
+                        Stroke="#E1E7EF"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Kategori dağılımı"
+                               FontSize="17"
+                               FontAttributes="Bold"
+                               TextColor="#14213D" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding CategoryBreakdown}"
+                                             Spacing="13">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="local:ExpenseBreakdownItem">
+                                    <VerticalStackLayout Spacing="4">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <Label Text="{Binding Name}"
+                                                   FontSize="13"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#344258" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding AmountLabel}"
+                                                   FontSize="13"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#14213D" />
+                                        </Grid>
+                                        <ProgressBar Progress="{Binding Share}"
+                                                     ProgressColor="#42A879"
+                                                     BackgroundColor="#E8EDF3" />
+                                        <Label Text="{Binding DetailsLabel}"
+                                               FontSize="11"
+                                               TextColor="#687386" />
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                        <Label Text="Bu dönemde harcama kaydı bulunmuyor."
+                               IsVisible="{Binding HasNoExpenses}"
+                               FontSize="13"
+                               TextColor="#687386" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="16"
+                        Background="White"
+                        Stroke="#E1E7EF"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Araçlara göre harcama"
+                               FontSize="17"
+                               FontAttributes="Bold"
+                               TextColor="#14213D" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding VehicleBreakdown}"
+                                             Spacing="13">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="local:ExpenseBreakdownItem">
+                                    <VerticalStackLayout Spacing="4">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <Label Text="{Binding Name}"
+                                                   FontSize="13"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#344258" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding AmountLabel}"
+                                                   FontSize="13"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#14213D" />
+                                        </Grid>
+                                        <ProgressBar Progress="{Binding Share}"
+                                                     ProgressColor="#5578B8"
+                                                     BackgroundColor="#E8EDF3" />
+                                        <Label Text="{Binding DetailsLabel}"
+                                               FontSize="11"
+                                               TextColor="#687386" />
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="16"
+                        Background="White"
+                        Stroke="#E1E7EF"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Son harcamalar"
+                               FontSize="17"
+                               FontAttributes="Bold"
+                               TextColor="#14213D" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding RecentExpenses}"
+                                             Spacing="0">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="local:RecentExpenseItem">
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          RowDefinitions="Auto,Auto,Auto"
+                                          Padding="0,10"
+                                          ColumnSpacing="8">
+                                        <Label Text="{Binding Description}"
+                                               FontSize="13"
+                                               FontAttributes="Bold"
+                                               TextColor="#344258"
+                                               LineBreakMode="TailTruncation" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding AmountLabel}"
+                                               FontSize="13"
+                                               FontAttributes="Bold"
+                                               TextColor="#14213D" />
+                                        <Label Grid.Row="1"
+                                               Text="{Binding DetailLabel}"
+                                               FontSize="11"
+                                               TextColor="#687386" />
+                                        <Label Grid.Row="1"
+                                               Grid.Column="1"
+                                               Text="{Binding CategoryLabel}"
+                                               FontSize="11"
+                                               TextColor="#687386"
+                                               HorizontalTextAlignment="End" />
+                                        <BoxView Grid.Row="2"
+                                                 Grid.ColumnSpan="2"
+                                                 HeightRequest="1"
+                                                 Color="#EEF1F5" />
+                                    </Grid>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                        <Label Text="Bu dönemde listelenecek harcama yok."
+                               IsVisible="{Binding HasNoExpenses}"
+                               FontSize="13"
+                               TextColor="#687386" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border IsVisible="{Binding HasError}"
+                        Padding="14"
+                        Background="#FFF0EE"
+                        Stroke="#F3C5BF"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 12">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="{Binding ErrorMessage}"
+                               FontSize="13"
+                               TextColor="#9B2C22" />
+                        <Button Text="Tekrar dene"
+                                Command="{Binding LoadCommand}"
+                                BackgroundColor="#14213D"
+                                TextColor="White"
+                                CornerRadius="10" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                   IsVisible="{Binding IsLoading}"
+                                   Color="#25436B"
+                                   HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

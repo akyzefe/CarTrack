@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:CarTrackApp"
+             xmlns:vm="clr-namespace:CarTrackApp"
+             x:Class="CarTrackApp.VehicleDetailPage"
+             x:Name="RootPage"
+             x:DataType="vm:VehicleExpensesViewModel"
+             Title="Bakım ve harcamalar"
+             Background="#F3F5F8">
+
+    <Grid RowDefinitions="Auto,*">
+        <Border Grid.Row="0"
+                Margin="16,12,16,8"
+                Padding="18"
+                Background="#14213D"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 16">
+            <Grid ColumnDefinitions="*,72" ColumnSpacing="14">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="{Binding Vehicle.brand}"
+                           FontSize="25"
+                           FontAttributes="Bold"
+                           TextColor="White" />
+                    <Label Text="{Binding Vehicle.model}"
+                           FontSize="16"
+                           TextColor="#D6E0F0" />
+                    <Grid RowDefinitions="Auto,Auto" Margin="0,5,0,0">
+                        <Label Text="{Binding Vehicle.engine}"
+                               FontSize="14"
+                               TextColor="#B9C9E5" />
+                        <HorizontalStackLayout Grid.Row="1"
+                                               Spacing="4"
+                                               HorizontalOptions="Start"
+                                               VerticalOptions="Center">
+                            <Label Text="{Binding Vehicle.currentKm, StringFormat='{0:N0} km'}"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="White"
+                                   VerticalOptions="Center" />
+                            <Button Text="✎"
+                                    Clicked="OnEditCurrentKmTapped"
+                                    SemanticProperties.Description="Kilometreyi düzenle"
+                                    FontSize="16"
+                                    Padding="5,0"
+                                    HeightRequest="32"
+                                    BackgroundColor="Transparent"
+                                    TextColor="White" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+                <Border Grid.Column="1"
+                        WidthRequest="68"
+                        HeightRequest="68"
+                        Background="White"
+                        Stroke="#D6E0F0"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 16"
+                        VerticalOptions="Center">
+                    <Grid>
+                        <Image Source="{Binding Vehicle.BrandLogoSource}"
+                               IsVisible="{Binding Vehicle.HasBrandLogo}"
+                               Aspect="AspectFit"
+                               Margin="8" />
+                        <Label Text="{Binding Vehicle.BrandBadgeText}"
+                               IsVisible="{Binding Vehicle.ShowBrandBadge}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="#25436B"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16,8,16,20" Spacing="12">
+                <Border IsVisible="{Binding HasUpcomingReminders}"
+                        Padding="15"
+                        Background="#FFF8E7"
+                        Stroke="#F1D28A"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14">
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Yaklaşan hatırlatmalar"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="#7A4B00" />
+                        <Label Text="{Binding UpcomingRemindersText}"
+                               FontSize="13"
+                               TextColor="#604214"
+                               LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="16"
+                        Background="White"
+                        Stroke="#E1E7EF"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14">
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Kayıt sayısı" FontSize="12" TextColor="#687386" />
+                            <Label Text="{Binding RecordCount}" FontSize="21" FontAttributes="Bold" TextColor="#14213D" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                            <Label Text="Toplam harcama" FontSize="12" TextColor="#687386" />
+                            <Label Text="{Binding TotalCostText}" FontSize="21" FontAttributes="Bold" TextColor="#25436B" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <Border Padding="16"
+                        Background="White"
+                        Stroke="#E1E7EF"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Ne eklemek istersin?"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="#14213D" />
+                        <Picker ItemsSource="{Binding EntryTypes}"
+                                SelectedItem="{Binding SelectedEntryType}"
+                                TextColor="#14213D"
+                                BackgroundColor="#F6F8FB" />
+
+                        <VerticalStackLayout IsVisible="{Binding IsMaintenanceEntry}" Spacing="12">
+                            <Border IsVisible="{Binding IsMaintenanceCategory}"
+                                    Padding="12"
+                                    Background="#F6F8FB"
+                                    Stroke="#DCE5EF"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Yapılan bakım işlemleri"
+                                           FontSize="15"
+                                           FontAttributes="Bold"
+                                           TextColor="#14213D" />
+                                    <HorizontalStackLayout Spacing="8">
+                                        <CheckBox IsChecked="{Binding EngineOilChanged}" Color="#25436B" />
+                                        <Label Text="Motor yağı değişti"
+                                               FontSize="14"
+                                               TextColor="#344258"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <Entry Text="{Binding EngineOilDetails}"
+                                           IsVisible="{Binding IsEngineOilChanged}"
+                                           Placeholder="Kullanılan yağ (isteğe bağlı)"
+                                           PlaceholderColor="#687386"
+                                           TextColor="#14213D"
+                                           BackgroundColor="White" />
+                                    <HorizontalStackLayout Spacing="8">
+                                        <CheckBox IsChecked="{Binding OilFilterChanged}" Color="#25436B" />
+                                        <Label Text="Yağ filtresi değişti"
+                                               FontSize="14"
+                                               TextColor="#344258"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="8">
+                                        <CheckBox IsChecked="{Binding AirFilterChanged}" Color="#25436B" />
+                                        <Label Text="Hava filtresi değişti"
+                                               FontSize="14"
+                                               TextColor="#344258"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="8">
+                                        <CheckBox IsChecked="{Binding CabinFilterChanged}" Color="#25436B" />
+                                        <Label Text="Polen filtresi değişti"
+                                               FontSize="14"
+                                               TextColor="#344258"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="8">
+                                        <CheckBox IsChecked="{Binding FuelFilterChanged}" Color="#25436B" />
+                                        <Label Text="Yakıt filtresi değişti"
+                                               FontSize="14"
+                                               TextColor="#344258"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border IsVisible="{Binding IsTireCategory}"
+                                    Padding="12"
+                                    Background="#F6F8FB"
+                                    Stroke="#DCE5EF"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12">
+                                <VerticalStackLayout Spacing="9">
+                                    <Label Text="Lastik bilgileri"
+                                           FontSize="15"
+                                           FontAttributes="Bold"
+                                           TextColor="#14213D" />
+                                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="6">
+                                        <Picker ItemsSource="{Binding TireWidths}"
+                                                SelectedItem="{Binding TireWidth}"
+                                                Title="Genişlik"
+                                                TextColor="#14213D"
+                                                BackgroundColor="White" />
+                                        <Picker Grid.Column="1"
+                                                ItemsSource="{Binding TireProfiles}"
+                                                SelectedItem="{Binding TireProfile}"
+                                                Title="Yanak"
+                                                TextColor="#14213D"
+                                                BackgroundColor="White" />
+                                        <Picker Grid.Column="2"
+                                                ItemsSource="{Binding TireRims}"
+                                                SelectedItem="{Binding TireRim}"
+                                                Title="Jant"
+                                                TextColor="#14213D"
+                                                BackgroundColor="White" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                        <Picker ItemsSource="{Binding TireSeasons}"
+                                                SelectedItem="{Binding SelectedTireSeason}"
+                                                Title="Mevsim"
+                                                TextColor="#14213D"
+                                                BackgroundColor="White" />
+                                        <Button Grid.Column="1"
+                                                Text="Google'da ara"
+                                                Command="{Binding SearchTiresCommand}"
+                                                BackgroundColor="#25436B"
+                                                TextColor="White"
+                                                CornerRadius="10"
+                                                Padding="12,0"
+                                                HeightRequest="48" />
+                                    </Grid>
+                                    <Entry Text="{Binding TireQuantity}"
+                                           Placeholder="Lastik adedi"
+                                           Keyboard="Numeric"
+                                           MaxLength="2"
+                                           PlaceholderColor="#687386"
+                                           TextColor="#14213D"
+                                           BackgroundColor="White" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Entry Text="{Binding Title}"
+                                   Placeholder="Açıklama (isteğe bağlı)"
+                                   PlaceholderColor="#687386"
+                                   TextColor="#14213D"
+                                   BackgroundColor="#F6F8FB" />
+
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <Entry Text="{Binding Cost}"
+                                       Placeholder="Tutar (₺)"
+                                       Keyboard="Numeric"
+                                       PlaceholderColor="#687386"
+                                       TextColor="#14213D"
+                                       BackgroundColor="#F6F8FB" />
+                                <Entry Grid.Column="1"
+                                       Text="{Binding AtKm}"
+                                       Placeholder="Kilometre"
+                                       Keyboard="Numeric"
+                                       PlaceholderColor="#687386"
+                                       TextColor="#14213D"
+                                       BackgroundColor="#F6F8FB" />
+                            </Grid>
+                            <Label Text="{Binding TireUnitPriceText}"
+                                   IsVisible="{Binding IsTireCategory}"
+                                   FontSize="13"
+                                   FontAttributes="Bold"
+                                   TextColor="#25436B" />
+
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                <Label Text="İşlem tarihi" FontSize="14" TextColor="#344258" VerticalOptions="Center" />
+                                <DatePicker Grid.Column="1"
+                                            Date="{Binding SelectedDate}"
+                                            Format="dd.MM.yyyy"
+                                            TextColor="#14213D"
+                                            HorizontalOptions="End" />
+                            </Grid>
+
+                            <Border IsVisible="{Binding IsMaintenanceCategory}"
+                                    Padding="12"
+                                    Background="#F6F8FB"
+                                    Stroke="#DCE5EF"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12">
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="Sonraki bakım hatırlatıcısı (isteğe bağlı)"
+                                           FontSize="14"
+                                           FontAttributes="Bold"
+                                           TextColor="#14213D" />
+                                    <HorizontalStackLayout Spacing="8">
+                                        <CheckBox IsChecked="{Binding HasDateReminder}" Color="#25436B" />
+                                        <Label Text="Tarihte hatırlat" FontSize="14" TextColor="#344258" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <DatePicker Date="{Binding DueDate}"
+                                                IsVisible="{Binding HasDateReminder}"
+                                                Format="dd.MM.yyyy"
+                                                TextColor="#14213D" />
+                                    <Label Text="Varsayılan, işlem tarihinden 1 yıl sonradır; tarihi değiştirebilirsin."
+                                           IsVisible="{Binding HasDateReminder}"
+                                           FontSize="11"
+                                           TextColor="#687386" />
+                                    <HorizontalStackLayout Spacing="8">
+                                        <CheckBox IsChecked="{Binding HasMileageReminder}" Color="#25436B" />
+                                        <Label Text="Kilometrede hatırlat" FontSize="14" TextColor="#344258" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <Entry Text="{Binding DueAtKm}"
+                                           IsVisible="{Binding HasMileageReminder}"
+                                           Placeholder="Sonraki bakım kilometresi"
+                                           Keyboard="Numeric"
+                                           PlaceholderColor="#687386"
+                                           TextColor="#14213D"
+                                           BackgroundColor="White" />
+                                    <Label Text="Varsayılan, güncel kilometreden 10.000 km sonradır; hedefi değiştirebilirsin."
+                                           IsVisible="{Binding HasMileageReminder}"
+                                           FontSize="11"
+                                           TextColor="#687386" />
+                                    <Label Text="Tarih bildirimi 30 gün önceden gelir."
+                                           FontSize="12"
+                                           TextColor="#687386" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Editor Text="{Binding Notes}"
+                                    Placeholder="Notlar (isteğe bağlı)"
+                                    PlaceholderColor="#687386"
+                                    TextColor="#14213D"
+                                    BackgroundColor="#F6F8FB"
+                                    AutoSize="TextChanges"
+                                    MinimumHeightRequest="72" />
+                            <Label Text="{Binding ErrorMessage}"
+                                   IsVisible="{Binding HasError}"
+                                   FontSize="13"
+                                   TextColor="#B42318" />
+                            <Button Text="Kaydı ekle"
+                                    Command="{Binding AddMaintenanceCommand}"
+                                    IsEnabled="{Binding IsNotLoading}"
+                                    BackgroundColor="#25436B"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    CornerRadius="11"
+                                    HeightRequest="48" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout IsVisible="{Binding IsFuelEntry}" Spacing="10">
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <Entry Text="{Binding FuelLiters}"
+                                       Placeholder="Litre"
+                                       Keyboard="Numeric"
+                                       PlaceholderColor="#687386"
+                                       TextColor="#14213D"
+                                       BackgroundColor="#F6F8FB" />
+                                <Entry Grid.Column="1"
+                                       Text="{Binding FuelCost}"
+                                       Placeholder="Tutar (₺)"
+                                       Keyboard="Numeric"
+                                       PlaceholderColor="#687386"
+                                       TextColor="#14213D"
+                                       BackgroundColor="#F6F8FB" />
+                            </Grid>
+                            <Entry Text="{Binding FuelAtKm}"
+                                   Placeholder="Yakıt alımındaki kilometre"
+                                   Keyboard="Numeric"
+                                   PlaceholderColor="#687386"
+                                   TextColor="#14213D"
+                                   BackgroundColor="#F6F8FB" />
+                            <HorizontalStackLayout Spacing="8">
+                                <CheckBox AutomationId="FuelFullTankCheckBox"
+                                          IsChecked="{Binding FuelIsFullTank}"
+                                          Color="#25436B" />
+                                <Label Text="Depoyu tamamen doldurdum"
+                                       FontSize="14"
+                                       TextColor="#344258"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding FuelConsumptionText}"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#25436B" />
+                            <Label Text="Yakıt tüketimi, iki tam depo arasındaki alımlardan hesaplanır."
+                                   FontSize="12"
+                                   TextColor="#687386" />
+                            <Label Text="{Binding FuelRecentRecordsText}"
+                                   IsVisible="{Binding HasFuelRecords}"
+                                   FontSize="12"
+                                   TextColor="#536176" />
+                            <Label Text="{Binding FuelErrorMessage}"
+                                   IsVisible="{Binding HasFuelError}"
+                                   FontSize="13"
+                                   TextColor="#B42318" />
+                            <Button Text="Yakıt kaydını ekle"
+                                    Command="{Binding AddFuelRecordCommand}"
+                                    IsEnabled="{Binding IsNotLoading}"
+                                    BackgroundColor="#25436B"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    CornerRadius="11"
+                                    HeightRequest="46" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout IsVisible="{Binding IsDocumentEntry}" Spacing="10">
+                            <Picker Title="Belge türünü seç"
+                                    ItemsSource="{Binding DocumentTypes}"
+                                    SelectedItem="{Binding SelectedDocumentType}"
+                                    TextColor="#14213D"
+                                    BackgroundColor="#F6F8FB" />
+                            <Label Text="Belgeyi aldığın / yenilediğin tarih"
+                                   FontSize="13"
+                                   FontAttributes="Bold"
+                                   TextColor="#344258" />
+                            <DatePicker Date="{Binding DocumentDate}"
+                                        Format="dd.MM.yyyy"
+                                        TextColor="#14213D" />
+                            <Label Text="{Binding DocumentExpirySummary}"
+                                   FontSize="12"
+                                   TextColor="#536176" />
+                            <Entry Text="{Binding DocumentExpenseCost}"
+                                   Placeholder="Belge harcaması (isteğe bağlı, ₺)"
+                                   Keyboard="Numeric"
+                                   PlaceholderColor="#687386"
+                                   TextColor="#14213D"
+                                   BackgroundColor="#F6F8FB" />
+                            <Label Text="{Binding DocumentErrorMessage}"
+                                   IsVisible="{Binding HasDocumentError}"
+                                   FontSize="13"
+                                   TextColor="#B42318" />
+                            <Button Text="Belge tarihini kaydet"
+                                    Command="{Binding SaveVehicleDocumentsCommand}"
+                                    IsEnabled="{Binding IsNotLoading}"
+                                    BackgroundColor="#25436B"
+                                    TextColor="White"
+                                    FontAttributes="Bold"
+                                    CornerRadius="11"
+                                    HeightRequest="46" />
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*,Auto" Margin="2,4,2,0">
+                    <Label Text="Harcama geçmişi"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#14213D"
+                           VerticalOptions="Center" />
+                    <ActivityIndicator Grid.Column="1"
+                                       IsRunning="{Binding IsLoading}"
+                                       IsVisible="{Binding IsLoading}"
+                                       Color="#25436B"
+                                       WidthRequest="24"
+                                       HeightRequest="24" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <Picker ItemsSource="{Binding HistoryFilters}"
+                            SelectedItem="{Binding SelectedHistoryFilter}"
+                            Title="Tarih aralığı"
+                            TextColor="#14213D"
+                            BackgroundColor="White" />
+                    <Label Grid.Column="1"
+                           Text="{Binding FilteredRecordCount, StringFormat='{0} kayıt'}"
+                           FontSize="13"
+                           TextColor="#536176"
+                           VerticalOptions="Center" />
+                </Grid>
+                <Label Text="{Binding MaintenanceEmptyMessage}"
+                       IsVisible="{Binding HasNoFilteredMaintenances}"
+                       FontSize="14"
+                       TextColor="#536176"
+                       HorizontalTextAlignment="Center"
+                       Padding="16" />
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding FilteredMaintenances}"
+                                     Spacing="10">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="local:MaintenanceDto">
+                            <SwipeView>
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItem Text="Sil"
+                                                   BackgroundColor="#B42318"
+                                                   Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.DeleteMaintenanceCommand, x:DataType={x:Null}}"
+                                                   CommandParameter="{Binding .}" />
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+                                <Border Padding="15"
+                                        Background="White"
+                                        Stroke="#E1E7EF"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 14">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnMaintenanceTapped" />
+                                    </Border.GestureRecognizers>
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          RowDefinitions="Auto,Auto,Auto,Auto"
+                                          RowSpacing="5">
+                                        <Label Text="{Binding category}"
+                                               FontSize="12"
+                                               TextColor="#25436B" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding cost, StringFormat='{0:N2} ₺'}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="#14213D"
+                                               HorizontalTextAlignment="End" />
+                                        <Label Grid.Row="1"
+                                               Grid.ColumnSpan="2"
+                                               Text="{Binding title}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="#14213D" />
+                                        <Label Grid.Row="2"
+                                               Text="{Binding date, StringFormat='{0:dd.MM.yyyy}'}"
+                                               FontSize="13"
+                                               TextColor="#536176" />
+                                        <Label Grid.Row="2"
+                                               Grid.Column="1"
+                                               Text="{Binding atKm, StringFormat='{0:N0} km'}"
+                                               FontSize="13"
+                                               TextColor="#536176"
+                                               HorizontalTextAlignment="End" />
+                                        <Label Grid.Row="3"
+                                               Grid.ColumnSpan="2"
+                                               Text="{Binding notes}"
+                                               IsVisible="{Binding hasNotes}"
+                                               FontSize="13"
+                                               TextColor="#687386" />
+                                    </Grid>
+                                </Border>
+                            </SwipeView>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:CarTrackApp"
+             xmlns:vm="clr-namespace:CarTrackApp"
+             x:Class="CarTrackApp.MainPage"
+             x:Name="RootPage"
+             x:DataType="vm:MainViewModel"
+             Title="Garajım"
+             Background="#F3F5F8">
+
+    <Grid>
+      <CollectionView ItemsSource="{Binding Vehicles}"
+                      SelectionMode="None"
+                      Margin="0">
+        <CollectionView.Header>
+            <VerticalStackLayout Spacing="0">
+                <Grid Padding="24,24,24,28"
+                      Background="#14213D"
+                      RowDefinitions="Auto,Auto,Auto">
+                    <Label Text="CARTRACK"
+                           FontSize="12"
+                           CharacterSpacing="2"
+                           FontAttributes="Bold"
+                           TextColor="#B9C9E5" />
+                    <Grid Grid.Row="1"
+                          Margin="0,14,0,4"
+                          ColumnDefinitions="*,Auto">
+                        <Label Text="Garajın"
+                               FontSize="32"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               VerticalOptions="Center" />
+                        <Image Grid.Column="1"
+                               Source="garage.png"
+                               WidthRequest="80"
+                               HeightRequest="80"
+                               Aspect="AspectFit"
+                               VerticalOptions="Center"
+                               TranslationY="-15"
+                               Margin="12,0,0,0" />
+                    </Grid>
+                    <Label Grid.Row="2"
+                           Text="Araçlarını ve bakım geçmişini tek yerde takip et."
+                           FontSize="14"
+                           TextColor="#D6E0F0" />
+                </Grid>
+
+                <VerticalStackLayout Padding="20,12,20,8" Spacing="14">
+                    <Border Padding="12,9"
+                            Background="White"
+                            Stroke="#E1E7EF"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
+                            <Label Text="{Binding WeatherIcon}"
+                                   FontSize="23"
+                                   VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="{Binding WeatherSummary}"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       TextColor="#14213D"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding CarWashAdvice}"
+                                       FontSize="11"
+                                       TextColor="{Binding CarWashAdviceColor}"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding WeatherErrorMessage}"
+                                       IsVisible="{Binding HasWeatherError}"
+                                       FontSize="11"
+                                       TextColor="#B42318"
+                                       LineBreakMode="TailTruncation" />
+                            </VerticalStackLayout>
+                            <ActivityIndicator Grid.Column="2"
+                                               IsRunning="{Binding IsWeatherBusy}"
+                                               IsVisible="{Binding IsWeatherBusy}"
+                                               Color="#25436B"
+                                               WidthRequest="20"
+                                               HeightRequest="20"
+                                               VerticalOptions="Center" />
+                            <Button Grid.Column="3"
+                                    Text="{Binding WeatherLocationButtonText}"
+                                    Command="{Binding OpenWeatherLocationPopupCommand}"
+                                    BackgroundColor="Transparent"
+                                    TextColor="#25436B"
+                                    FontSize="11"
+                                    Padding="4,0"
+                                    HeightRequest="32"
+                                    VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+
+                    <Border Padding="14,12"
+                            Background="#14213D"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 14">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenExpenseStatisticsCommand}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="11">
+                            <Border WidthRequest="38"
+                                    HeightRequest="38"
+                                    Background="#25436B"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 11"
+                                    VerticalOptions="Center">
+                                <Label Text="₺"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="Bu ayki harcamalar"
+                                       FontSize="13"
+                                       TextColor="#D6E0F0" />
+                                <Label Text="{Binding MonthlyExpensesDetails}"
+                                       FontSize="11"
+                                       TextColor="#B9C9E5"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding MonthlyExpensesErrorMessage}"
+                                       IsVisible="{Binding HasMonthlyExpensesError}"
+                                       FontSize="11"
+                                       TextColor="#FFC7C2"
+                                       LineBreakMode="TailTruncation" />
+                            </VerticalStackLayout>
+                            <Grid Grid.Column="2" ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="6"
+                                  VerticalOptions="Center">
+                                <ActivityIndicator IsRunning="{Binding IsMonthlyExpensesLoading}"
+                                                   IsVisible="{Binding IsMonthlyExpensesLoading}"
+                                                   Color="White"
+                                                   WidthRequest="18"
+                                                   HeightRequest="18"
+                                                   VerticalOptions="Center" />
+                                <Label Grid.Column="1"
+                                       Text="{Binding MonthlyExpensesTotal}"
+                                       FontSize="17"
+                                       FontAttributes="Bold"
+                                       TextColor="White"
+                                       VerticalOptions="Center" />
+                                <Border Grid.Column="2"
+                                        Padding="9,5"
+                                        Background="#25436B"
+                                        StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 10"
+                                        IsVisible="{Binding IsNotMonthlyExpensesLoading}"
+                                        VerticalOptions="Center">
+                                    <Label Text="Analiz"
+                                           FontSize="11"
+                                           FontAttributes="Bold"
+                                           TextColor="White" />
+                                </Border>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" VerticalOptions="Center">
+                        <Label Text="Araçlarım"
+                               FontSize="21"
+                               FontAttributes="Bold"
+                               TextColor="#14213D"
+                               VerticalOptions="Center" />
+                        <Border Grid.Column="1"
+                                Padding="11,5"
+                                Background="#E4ECF7"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 14">
+                            <Label Text="{Binding VehicleCount, StringFormat='{0} araç'}"
+                                   FontSize="13"
+                                   FontAttributes="Bold"
+                                   TextColor="#25436B" />
+                        </Border>
+                        <ActivityIndicator Grid.Column="2"
+                                           IsRunning="{Binding IsLoading}"
+                                           IsVisible="{Binding IsLoading}"
+                                           Color="#25436B"
+                                           WidthRequest="24"
+                                           HeightRequest="24"
+                                           VerticalOptions="Center" />
+                    </Grid>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </CollectionView.Header>
+
+        <CollectionView.EmptyView>
+            <Border Margin="20,4,20,20"
+                    Padding="20"
+                    Background="White"
+                    Stroke="#E1E7EF"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 14">
+                <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                    <Label Text="{Binding EmptyMessage}"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#14213D"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="İlk aracını eklemek için aşağıdaki formu kullan."
+                           FontSize="13"
+                           TextColor="#536176"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </Border>
+        </CollectionView.EmptyView>
+
+        <CollectionView.ItemTemplate>
+            <DataTemplate x:DataType="local:VehicleDto">
+                <SwipeView Margin="20,0,20,12">
+                    <SwipeView.RightItems>
+                        <SwipeItems>
+                            <SwipeItem Text="Sil"
+                                       BackgroundColor="#B42318"
+                                       Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.DeleteVehicleCommand, x:DataType={x:Null}}"
+                                       CommandParameter="{Binding .}" />
+                        </SwipeItems>
+                    </SwipeView.RightItems>
+
+                    <Border Padding="16"
+                            Background="White"
+                            Stroke="#E1E7EF"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.GoToDetailsCommand, x:DataType={x:Null}}"
+                                CommandParameter="{Binding .}" />
+                            <DropGestureRecognizer AllowDrop="True"
+                                                   Drop="OnVehicleDrop" />
+                        </Border.GestureRecognizers>
+
+                        <Grid ColumnDefinitions="48,*,Auto"
+                              RowDefinitions="Auto,Auto,Auto"
+                              ColumnSpacing="12"
+                              RowSpacing="5">
+                            <Border Grid.RowSpan="3"
+                                    WidthRequest="46"
+                                    HeightRequest="46"
+                                    Background="White"
+                                    Stroke="#E1E7EF"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 13"
+                                    VerticalOptions="Start">
+                                <Grid>
+                                    <Image Source="{Binding BrandLogoSource}"
+                                           IsVisible="{Binding HasBrandLogo}"
+                                           Aspect="AspectFit"
+                                           Margin="8" />
+                                    <Label Text="{Binding BrandBadgeText}"
+                                           IsVisible="{Binding ShowBrandBadge}"
+                                           FontSize="13"
+                                           FontAttributes="Bold"
+                                           TextColor="#25436B"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+
+                            <Label Grid.Column="1"
+                                   Text="{Binding brand}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#14213D" />
+                            <Label Grid.Row="1"
+                                   Grid.Column="1"
+                                   Text="{Binding model}"
+                                   FontSize="15"
+                                   TextColor="#344258" />
+                            <Label Grid.Row="2"
+                                   Grid.Column="1"
+                                   Text="{Binding engine}"
+                                   FontSize="13"
+                                   TextColor="#536176" />
+                            <Label Grid.Row="0"
+                                   Grid.Column="2"
+                                   Text="{Binding year}"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#344258"
+                                   HorizontalTextAlignment="End" />
+                            <Label Grid.Row="1"
+                                   Grid.Column="2"
+                                   Text="⠿"
+                                   FontSize="22"
+                                   TextColor="#687386"
+                                   HorizontalOptions="End"
+                                   VerticalOptions="Center"
+                                   SemanticProperties.Description="Aracı sürükleyerek sırala">
+                                <Label.GestureRecognizers>
+                                    <DragGestureRecognizer DragStarting="OnVehicleDragStarting" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Grid.Row="2"
+                                   Grid.Column="2"
+                                   Text="{Binding currentKm, StringFormat='{0:N0} km'}"
+                                   FontSize="13"
+                                   TextColor="#536176"
+                                   HorizontalTextAlignment="End"
+                                   VerticalOptions="End" />
+                        </Grid>
+                    </Border>
+                </SwipeView>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+
+        <CollectionView.Footer>
+            <Border Margin="20,4,20,20"
+                    Padding="16"
+                    Background="White"
+                    Stroke="#E1E7EF"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 16">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Yeni araç ekle"
+                           FontSize="17"
+                           FontAttributes="Bold"
+                           TextColor="#14213D" />
+
+                    <Grid HeightRequest="50">
+                        <Picker Title="Marka seç"
+                                ItemsSource="{Binding BrandOptions}"
+                                SelectedItem="{Binding Brand}"
+                                SelectedIndexChanged="OnBrandSelected"
+                                IsVisible="{Binding IsNotCustomBrand}"
+                                TextColor="#14213D"
+                                BackgroundColor="#F6F8FB" />
+                        <Entry Text="{Binding CustomBrand}"
+                               IsVisible="{Binding IsCustomBrand}"
+                               Placeholder="Marka adını yaz"
+                               PlaceholderColor="#687386"
+                               TextColor="#14213D"
+                               Background="#F6F8FB" />
+                    </Grid>
+
+                    <Grid HeightRequest="50">
+                        <Picker Title="Önce marka seç"
+                                ItemsSource="{Binding ModelOptions}"
+                                SelectedItem="{Binding Model}"
+                                SelectedIndexChanged="OnModelSelected"
+                                IsEnabled="{Binding HasSelectedBrand}"
+                                IsVisible="{Binding IsNotCustomModel}"
+                                TextColor="#14213D"
+                                BackgroundColor="#F6F8FB" />
+                        <Entry Text="{Binding CustomModel}"
+                               IsVisible="{Binding IsCustomModel}"
+                               Placeholder="Model adını yaz"
+                               PlaceholderColor="#687386"
+                               TextColor="#14213D"
+                               Background="#F6F8FB" />
+                    </Grid>
+
+                    <Grid HeightRequest="50">
+                        <Picker Title="Seçilen modelin motor seçenekleri"
+                                ItemsSource="{Binding EngineOptions}"
+                                SelectedItem="{Binding Engine}"
+                                IsVisible="{Binding IsNotCustomEngine}"
+                                TextColor="#14213D"
+                                BackgroundColor="#F6F8FB" />
+                        <Entry Text="{Binding CustomEngine}"
+                               IsVisible="{Binding IsCustomEngine}"
+                               Placeholder="Motor bilgisini yaz"
+                               PlaceholderColor="#687386"
+                               TextColor="#14213D"
+                               Background="#F6F8FB" />
+                    </Grid>
+
+                    <Label Text="Listelenen motorlar modele ait yaygın seçeneklerdir; doğru motoru model yılına göre doğrula."
+                           FontSize="12"
+                           TextColor="#687386" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Entry Grid.Column="0"
+                               Text="{Binding Year}"
+                               Placeholder="Model yılı"
+                               Keyboard="Numeric"
+                               MaxLength="4"
+                               PlaceholderColor="#687386"
+                               TextColor="#14213D"
+                               Background="#F6F8FB"
+                               ReturnType="Next" />
+                        <Entry Grid.Column="1"
+                               Text="{Binding CurrentKm}"
+                               Placeholder="Kilometre"
+                               Keyboard="Numeric"
+                               PlaceholderColor="#687386"
+                               TextColor="#14213D"
+                               Background="#F6F8FB"
+                               ReturnType="Done" />
+                    </Grid>
+
+                    <Label Text="{Binding ErrorMessage}"
+                           IsVisible="{Binding HasError}"
+                           FontSize="13"
+                           TextColor="#B42318" />
+
+                    <Button Text="Aracı kaydet"
+                            Command="{Binding AddVehicleCommand}"
+                            IsEnabled="{Binding IsNotLoading}"
+                            Background="#25436B"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            CornerRadius="11"
+                            HeightRequest="48" />
+
+                    <Button Text="Tekrar dene"
+                            Command="{Binding LoadVehiclesCommand}"
+                            IsVisible="{Binding HasLoadError}"
+                            IsEnabled="{Binding IsNotLoading}"
+                            Background="Transparent"
+                            TextColor="#25436B"
+                            FontAttributes="Bold"
+                            HeightRequest="40" />
+                </VerticalStackLayout>
+            </Border>
+        </CollectionView.Footer>
+      </CollectionView>
+
+        <Border IsVisible="{Binding IsAiMechanicOpen}"
+                WidthRequest="330"
+                HeightRequest="470"
+                Margin="12,0,16,92"
+                Padding="0"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Background="White"
+                Stroke="#DCE5EF"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 18"
+                ZIndex="1">
+            <Grid RowDefinitions="Auto,Auto,*,Auto,Auto"
+                  RowSpacing="0">
+                <Grid Padding="14,12"
+                      ColumnDefinitions="*,Auto"
+                      Background="#14213D">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="AI Mechanic"
+                               FontSize="17"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+                        <Label Text="{Binding SelectedAiVehicleDisplay}"
+                               FontSize="11"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+                        <Label Text="Soru ve araç bilgileri Google'a gider"
+                               FontSize="11"
+                               TextColor="#D6E0F0" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1"
+                            Text="×"
+                            Command="{Binding CloseAiMechanicCommand}"
+                            FontSize="24"
+                            Padding="6,0"
+                            HeightRequest="36"
+                            WidthRequest="36"
+                            BackgroundColor="Transparent"
+                            TextColor="White"
+                            SemanticProperties.Description="AI Mechanic sohbetini gizle" />
+                </Grid>
+
+                <Picker Grid.Row="1"
+                        Margin="12,8"
+                        ItemsSource="{Binding Vehicles}"
+                        SelectedItem="{Binding SelectedAiVehicle}"
+                        Title="Araç seç"
+                        TextColor="#14213D"
+                        BackgroundColor="#F6F8FB" />
+
+                <ScrollView Grid.Row="2" Margin="12,4">
+                    <VerticalStackLayout Spacing="10"
+                                         BindableLayout.ItemsSource="{Binding AiMechanicMessages}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="local:AiMechanicChatMessage">
+                                <Border Padding="10"
+                                        HorizontalOptions="Start"
+                                        Background="#F0F4F8"
+                                        StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 12">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border"
+                                                     Binding="{Binding Role}"
+                                                     Value="user">
+                                            <Setter Property="HorizontalOptions" Value="End" />
+                                            <Setter Property="Background" Value="#E6F4EC" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <VerticalStackLayout Spacing="4">
+                                        <Label Text="{Binding Sender}"
+                                               FontSize="10"
+                                               FontAttributes="Bold"
+                                               TextColor="#536176" />
+                                        <Label Text="{Binding Content}"
+                                               FontSize="13"
+                                               TextColor="#14213D"
+                                               LineBreakMode="WordWrap" />
+                                        <Label Text="{Binding Disclaimer}"
+                                               IsVisible="{Binding HasDisclaimer}"
+                                               FontSize="10"
+                                               TextColor="#687386"
+                                               LineBreakMode="WordWrap" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </ScrollView>
+
+                <VerticalStackLayout Grid.Row="3" Margin="12,0" Spacing="4">
+                    <HorizontalStackLayout Spacing="6" IsVisible="{Binding IsAiMechanicBusy}">
+                        <ActivityIndicator IsRunning="{Binding IsAiMechanicBusy}"
+                                           Color="#25436B"
+                                           WidthRequest="18"
+                                           HeightRequest="18" />
+                        <Label Text="Yanıt hazırlanıyor..."
+                               FontSize="12"
+                               TextColor="#536176"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <Label Text="{Binding AiMechanicErrorMessage}"
+                           IsVisible="{Binding HasAiMechanicError}"
+                           FontSize="12"
+                           TextColor="#B42318" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Row="4" Padding="12,6,12,12" Spacing="7">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Text="{Binding AiMechanicQuestion}"
+                               Placeholder="Araç hakkında merak ettiğini sor"
+                               MaxLength="1200"
+                               ReturnType="Send"
+                               ReturnCommand="{Binding SendAiMechanicMessageCommand}"
+                               IsEnabled="{Binding IsNotAiMechanicBusy}"
+                               PlaceholderColor="#687386"
+                               TextColor="#14213D"
+                               BackgroundColor="#F6F8FB" />
+                        <Button Grid.Column="1"
+                                Text="Gönder"
+                                Command="{Binding SendAiMechanicMessageCommand}"
+                                IsEnabled="{Binding IsNotAiMechanicBusy}"
+                                BackgroundColor="#25436B"
+                                TextColor="White"
+                                CornerRadius="10"
+                                Padding="12,0"
+                                HeightRequest="48" />
+                    </Grid>
+                    <Label Text="Ücretsiz kotada içerikler Google ürünlerini geliştirmekte kullanılabilir. Yanıtlar kesin teşhis değildir."
+                           FontSize="10"
+                           TextColor="#687386"
+                           LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <Grid x:Name="AiMechanicFloatingButton"
+              IsVisible="{Binding IsAiMechanicClosed}"
+              WidthRequest="76"
+              HeightRequest="76"
+              Margin="16,0,20,24"
+              HorizontalOptions="End"
+              VerticalOptions="End"
+              ZIndex="2">
+            <Grid.GestureRecognizers>
+                <PanGestureRecognizer PanUpdated="OnAiMechanicPanUpdated" />
+            </Grid.GestureRecognizers>
+            <Border IsVisible="{Binding IsAiMechanicButtonVisible}"
+                    Padding="0"
+                    Background="Transparent"
+                    StrokeThickness="0"
+                    StrokeShape="Ellipse">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleAiMechanicCommand}" />
+                </Border.GestureRecognizers>
+                <Image Source="hazardwarning.png"
+                       Aspect="AspectFill"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       SemanticProperties.Description="AI Mechanic sohbetini aç" />
+            </Border>
+            <Border IsVisible="{Binding IsAiMechanicButtonVisible}"
+                    WidthRequest="20"
+                    HeightRequest="20"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start"
+                    Background="#14213D"
+                    Stroke="#FFFFFF"
+                    StrokeThickness="1"
+                    StrokeShape="Ellipse"
+                    SemanticProperties.Description="AI Mechanic düğmesini gizle">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding HideAiMechanicButtonCommand}" />
+                </Border.GestureRecognizers>
+                <Label Text="×"
+                       FontSize="14"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"
+                       InputTransparent="True" />
+            </Border>
+        </Grid>
+
+        <Border IsVisible="{Binding IsAiMechanicButtonHidden}"
+                x:Name="AiMechanicRestoreButton"
+                Margin="25,0,20,24"
+                Padding="13,9"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Background="#14213D"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 18"
+                ZIndex="2">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnRestoreAiMechanicButtonTapped" />
+            </Border.GestureRecognizers>
+            <Label Text="AI Mechanic"
+                   FontSize="12"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   SemanticProperties.Description="AI Mechanic düğmesini göster" />
+        </Border>
+
+        <Grid x:Name="GarageLoadingOverlay"
+              IsVisible="True"
+              Opacity="1"
+              Background="#F3F5F8"
+              ZIndex="20">
+            <VerticalStackLayout Padding="28"
+                                 Spacing="20"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center">
+                <Label Text="CARTRACK"
+                       FontSize="13"
+                       CharacterSpacing="3"
+                       FontAttributes="Bold"
+                       TextColor="#25436B"
+                       HorizontalTextAlignment="Center" />
+                <Grid WidthRequest="320"
+                      HeightRequest="220"
+                      HorizontalOptions="Center">
+                    <Image Source="garage_background.png"
+                           Aspect="AspectFit" />
+                    <Image x:Name="GarageDoorImage"
+                           Source="garage_door.png"
+                           Aspect="AspectFit"
+                           InputTransparent="True" />
+                </Grid>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Garajın hazırlanıyor"
+                           FontSize="19"
+                           FontAttributes="Bold"
+                           TextColor="#14213D"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="Araçların ve bakım kayıtların yükleniyor"
+                           FontSize="13"
+                           TextColor="#687386"
+                           HorizontalTextAlignment="Center" />
+                    <ActivityIndicator IsRunning="True"
+                                       Color="#25436B"
+                                       HorizontalOptions="Center"
+                                       Margin="0,2,0,0" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Grid>
+
+    </Grid>
+</ContentPage>

@@ -1,0 +1,26 @@
+# .NET build output
+bin/
+obj/
+
+# Visual Studio and IDE settings
+.vs/
+.idea/
+*.user
+*.suo
+
+# macOS
+.DS_Store
+
+# Test and publish output
+TestResults/
+publish/
+artifacts/
+
+# Logs
+*.log
+
+# Local configuration and secrets
+.env
+.env.*
+appsettings.Development.json
+appsettings.Local.json
